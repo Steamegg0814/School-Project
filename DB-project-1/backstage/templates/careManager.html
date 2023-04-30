@@ -1,0 +1,101 @@
+{% extends "backstage.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+<!-- website title -->
+{% block title %} 保養管理 {% endblock title %}
+
+{% block content %}
+<!-- website content -->
+{% with messages = get_flashed_messages() %}
+{% if messages[0] == 'No permission' %}
+  
+<script language="javascript">
+
+  alert('您沒有管理者權限喔！');
+
+
+</script>
+{% endif %}
+{% endwith %}
+
+
+<script>
+    $(document).ready(function () {
+        $("#keyword").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#care tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
+
+<br />
+<div class="d-flex justify-content-between container-xxl">
+    <div class="d-flex col-sm-4">
+        <span class="input-group-text" id="basic-addon1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search"
+                viewBox="0 0 16 16">
+                <path
+                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+            </svg>
+        </span>
+        <input class="form-control me-2" id="keyword" placeholder="搜尋保養" aria-label="Search">
+    </div>
+</div>
+
+<br />
+
+<div class="container-xxl">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <!-- <th width="10%">商品編號</th> -->
+                <th>
+                    <center>會員編號</center>
+                </th>
+                <th>
+                    <center>商品編號</center>
+                </th>
+                <th>
+                    <center>商品名稱</center>
+                </th>
+                <td>
+                    <center>保養費用</center>
+                </td>
+                <th>
+                    <center>送件時間</center>
+                </th>
+                <th>
+                    <center>取件時間</center>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="care">
+        {% for i in careData %}
+            <tr>
+                <td>
+                    <center>{{ i.會員編號 }}</center>
+                </td>
+                <td>
+                    <center>{{ i.商品編號 }}</center>
+                </td>
+                <td>
+                    <center>{{ i.商品名稱 }}</center>
+                </td>
+                <td>
+                    <center>{{ i.保養費用 }}</center>
+                </td>
+                <td>
+                    <center>{{ i.送件時間 }}</center>
+                </td>
+                <td>
+                    <center>{{ i.取件時間 }}</center>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

@@ -1,0 +1,109 @@
+{% extends "frontstage.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+
+{% block title %}保養預約{% endblock title%}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages[0] == 'No permission' %}
+
+<!-- <script language="javascript">
+    alert('您沒有使用者的權限喔！');
+</script> -->
+
+{% endif %}
+{% endwith %}
+<html>
+
+<head>
+    <title>預約保養</title>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script>
+        function modifyMinMaxDate(date, days) {
+            var tempDate = date;
+            tempDate.setDate(tempDate.getDate() + days);
+            return tempDate;
+        }
+
+        $(function () {
+            var dateFormat = "mm/dd/yy",
+                //限定最近7天送件
+                from = $("#from").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    changeYear: true,
+                    minDate: "1",
+                    maxDate: "7",
+                    onClose: function (selectedDate) {
+                        $("#to").datepicker(
+                            "option",
+                            "minDate",
+                            modifyMinMaxDate(new Date(selectedDate), 7)
+                        );
+                    }
+                }),
+                // 送件日期+14~28
+                to = $("#to").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    changeYear: true,
+                    minDate: "14",
+                    maxDate: "28",
+                    onClose: function (selectedDate) {
+                        $("#from").datepicker(
+                            "option",
+                            "maxDate",
+                            modifyMinMaxDate(new Date(selectedDate), 14)
+                        );
+                    }
+                });
+        });
+
+    </script>
+</head>
+
+<body>
+    <br />
+    <div class="container-xl">
+        <form method="post" action={{ url_for('bookstore.care') }}>
+            <table class="table table-bordered">
+                <tr>
+                    <th>
+                        <center>商品名稱</center>
+                    </th>
+                    <th>
+                        <center>預約送件日期</center>
+                    </th>
+                    <th>
+                        <center>預約取件日期</center>
+                    </th>
+                </tr>
+                <tr>
+                    <td width="34%">
+                        <select name="pid" class="form-control">
+                            {% for book in book_data %}
+                            <option value="{{book.商品編號}}">{{book.商品編號}} {{book.商品名稱}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="text" id="from" name="ptime" class="form-control"></p>
+                    </td>
+                    <td><input type="text" id="to" name="dtime" class="form-control"></p>
+                    </td>
+                </tr>
+            </table>
+            <td>
+                <center><button class="btn btn-success" type="submit" name="buy">送出</button></center>
+            </td>
+
+        </form>
+    </div>
+</body>
+
+</html>
+{% endblock content%}
