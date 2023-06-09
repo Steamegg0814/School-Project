@@ -1,0 +1,20 @@
+body {
+    background-color: #171a21 !important;
+}
+
+h5, h6 {
+    text-align: center !important;
+    color: white !important;
+}
+
+.container {
+    padding: 2rem 0rem;
+  }
+  
+  h4 {
+    margin: 2rem 0rem 1rem;
+  }
+  
+  .table td, th {
+      vertical-align: middle;
+    }
