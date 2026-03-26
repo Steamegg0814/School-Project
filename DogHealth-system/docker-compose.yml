@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: dog-health-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: doghealth
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - dog-health-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/doghealth --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dog-health-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/doghealth
+      LINE_CHANNEL_TOKEN: ${LINE_CHANNEL_TOKEN}
+      LINE_CHANNEL_SECRET: ${LINE_CHANNEL_SECRET}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - dog-health-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dog-health-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - dog-health-network
+
+networks:
+  dog-health-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
